@@ -70,3 +70,21 @@ Tracks a specific event.
 Tracks a continuous event in the current context.
 
 For more detailed documentation and support, please contact us at info@moveo.one
+
+------------------
+
+To install the Moveo One analytics library for web, please follow the instructions below:
+
+1. Add the Moveo One analytics script to your HTML file:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/moveo-one-analytics@latest/dist/moveo-one.min.js"></script>
+``` 
+
+2. Initialize the Moveo One analytics instance:
+
+```html
+<script>
+  moveoOne.initialize('<YOUR_TOKEN>');
+``` 
+
