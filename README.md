@@ -85,7 +85,7 @@ To install the Moveo One analytics library for web, please follow the instructio
 
 ```html
 <!-- In the <head> section -->
-<script src="https://your-cdn.azureedge.net/moveo-one.min.js"></script>
+<script src="https://moveoonestorage.blob.core.windows.net/000-scripts/moveo-one-script.min.js"></script>
 <script>
   // Initialize MoveoOne with their token
   const moveo = MoveoOne.init('YOUR_TOKEN_HERE');
