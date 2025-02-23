@@ -1,5 +1,5 @@
 {
-  "name": "moveo-one-analytics",
+  "name": "moveo-one-analytics-js",
   "version": "1.0.0",
   "description": "Moveo One analytics library for JavaScript applications",
   "main": "dist/index.js",
@@ -7,12 +7,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "rollup -c",
-    "test": "jest",
     "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/moveo-one-analytics"
+    "url": "git+https://github.com/divstechnologydev/moveo-analytics-js"
   },
   "dependencies": {
     "axios": "^1.5.1"
