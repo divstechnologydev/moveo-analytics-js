@@ -1,4 +1,4 @@
-# moveo-one-analytics
+# moveo-one-analytics-js
 
 <div align="center">
   <img src="https://github.com/divstechnologydev/moveo-analytics-react-native/assets/6665139/3755d4fc-d4bc-47dd-a543-9c131a38772c" height="150"/>
@@ -25,7 +25,7 @@ yarn add moveo-one-analytics
 ## Usage
 
 ```javascript
-import { MoveoOne } from 'moveo-one-analytics';
+import { MoveoOne } from 'moveo-one-analytics-js';
 
 // Initialize with your token
 const analytics = MoveoOne.getInstance('<YOUR_TOKEN>');
