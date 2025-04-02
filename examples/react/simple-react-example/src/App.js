@@ -1,21 +1,47 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
+import { MoveoOne } from 'moveo-one-analytics';
+
+const analytics = MoveoOne.getInstance('<YOUR_SDK_TOKEN>');
 
 function App() {
   const [inputText, setInputText] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    analytics.tick({
+      semanticGroup: 'main_screen',
+      id: 'screen_load',
+      type: 'div',
+      action: 'view',
+      value: 'Main Screen Loaded'
+    });
+  }, []);
 
   const handlePress = (buttonName) => {
+    analytics.track('main_screen', {
+      semanticGroup: 'button_group',
+      id: buttonName === "Button One" ? 'button_one' : 'button_two',
+      type: 'button',
+      action: 'click',
+      value: buttonName
+    });
     console.log(`${buttonName} clicked!`);
     if (buttonName === "Button One") {
       navigate("/second-screen");
     }
   };
 
-  const handleInputBlur = () => {};
+  const handleInputBlur = () => {
+    analytics.track('main_screen', {
+      semanticGroup: 'input_field',
+      id: 'input_blur',
+      type: 'input',
+      action: 'blur',
+      value: inputText
+    });
+  };
 
   return (
     <div className="main-container">
