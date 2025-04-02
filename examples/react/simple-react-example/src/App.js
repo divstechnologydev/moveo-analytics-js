@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
-import { MoveoOne } from "moveo-one-analytics-js";
+import { useNavigate } from "react-router-dom";
 import "./App.css";
 
 function App() {
   const [inputText, setInputText] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {}, []);
 
   const handlePress = (buttonName) => {
     console.log(`${buttonName} clicked!`);
+    if (buttonName === "Button One") {
+      navigate("/second-screen");
+    }
   };
 
   const handleInputBlur = () => {};
