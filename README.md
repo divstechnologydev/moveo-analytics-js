@@ -5,6 +5,7 @@
 </div>
 
 ## Table of Contents
+
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -17,36 +18,32 @@ Moveo One analytics is a user cognitive-behavioral analytics tool. This SDK prov
 ## Installation
 
 ```bash
-npm install moveo-one-analytics
+npm install moveo-one-analytics-js
 # or
-yarn add moveo-one-analytics
+yarn add moveo-one-analytics-js
 ```
 
 ## Usage
 
 ```javascript
-import { MoveoOne } from 'moveo-one-analytics-js';
+import { MoveoOne } from "moveo-one-analytics-js";
 
 // Initialize with your token
-const analytics = MoveoOne.getInstance('<YOUR_TOKEN>');
-
-// Identify user
-analytics.identify('user123');
+const analytics = MoveoOne.getInstance("<YOUR_TOKEN>");
 
 // Start tracking a context
-analytics.start('checkout_flow', {
-  version: '1.0.0',
-  environment: 'production'
+analytics.start("checkout_flow", {
+  version: "1.0.0",
+  environment: "production",
 });
 
 // Track an event
-analytics.track('checkout_flow', {
-  semanticGroup: 'payment',
-  id: 'submit_button',
-  type: 'button',
-  action: 'click',
-  value: 'complete',
-  metadata: { amount: 99.99 }
+analytics.track("checkout_flow", {
+  semanticGroup: "payment",
+  id: "submit_button",
+  type: "button",
+  action: "click",
+  value: "complete",
 });
 ```
 
@@ -55,20 +52,23 @@ analytics.track('checkout_flow', {
 ### Core Methods
 
 #### `MoveoOne.getInstance(token)`
+
 Creates or returns the singleton instance of MoveoOne.
 
 #### `identify(userId)`
+
 Sets the user identifier for tracking.
 
 #### `start(context, metadata?)`
+
 Starts a new tracking session.
 
 #### `track(context, data)`
+
 Tracks a specific event.
 
 #### `tick(data)`
+
 Tracks a continuous event in the current context.
 
 For more detailed documentation and support, please contact us at info@moveo.one
-
-
