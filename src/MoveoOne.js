@@ -117,6 +117,23 @@ export class MoveoOne {
     }
   }
 
+  updateAdditionalMetadata(additionalMetadata) {
+    this.log("update additional metadata");
+    if (this.started) {
+      this.buffer.push({
+        c: this.context,
+        type: "update_additional_metadata",
+        userId: this.userId,
+        t: Date.now(),
+        prop: {},
+        meta: {},
+        additionalMeta: additionalMetadata,
+        sId: this.sessionId,
+      });
+      this.flushOrRecord(false);
+    }
+  }
+
   trackInternal(context, properties, metadata) {
     if (!this.started) {
       this.start(context, metadata);
