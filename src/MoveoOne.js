@@ -122,7 +122,7 @@ export class MoveoOne {
     if (this.started) {
       this.buffer.push({
         c: this.context,
-        type: "update_additional_metadata",
+        type: "update_metadata",
         userId: this.userId,
         t: Date.now(),
         prop: {},
