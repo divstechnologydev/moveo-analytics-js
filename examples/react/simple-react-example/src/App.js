@@ -11,7 +11,6 @@ function App() {
   const [inputText, setInputText] = useState("");
 
   useEffect(() => {
-    moveoInstance.identify("<USER_ID>");
     moveoInstance.start("main_screen", {
       app_version: "1.0.0",
       platform: "web",
