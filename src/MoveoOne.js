@@ -308,6 +308,7 @@ export class MoveoOne {
         method: "post",
         url: `${DOLPHIN_BASE_URL}/api/models/${encodeURIComponent(modelId)}/predict`,
         data: {
+          events: this.buffer,
           session_id: this.sessionId
         },
         headers: {
