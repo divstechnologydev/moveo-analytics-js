@@ -271,6 +271,15 @@ async predict(modelId): Promise<PredictionResponse>
 }
 ```
 
+**Conflict (Conditional Event Not Found)**
+```javascript
+{
+  success: false,
+  status: "conflict",
+  message: "Conditional event is not found"
+}
+```
+
 **Server Error**
 ```javascript
 {

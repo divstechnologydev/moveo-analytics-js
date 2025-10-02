@@ -381,6 +381,12 @@ export class MoveoOne {
               status: "not_found",
               message: "Model not found or not accessible"
             };
+          case 409:
+            return {
+              success: false,
+              status: "conflict",
+              message: "Conditional event is not found"
+            };
           case 422:
             return {
               success: false,
