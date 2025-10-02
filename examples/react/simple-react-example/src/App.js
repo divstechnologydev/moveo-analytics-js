@@ -52,6 +52,31 @@ function App() {
     });
   };
 
+  const handlePredict = async () => {
+    try {
+      console.log("Making prediction request...");
+      const result = await moveoInstance.predict("demo-model-123");
+      
+      if (result.success) {
+        if (result.status === "success") {
+          console.log("✅ Prediction received:");
+          console.log(`Model ID: ${result.model_id}`);
+          console.log(`Probability: ${result.prediction_probability}`);
+          console.log(`Binary result: ${result.prediction_binary}`);
+        } else if (result.status === "pending") {
+          console.log("⏳ Prediction pending:");
+          console.log(`Message: ${result.message}`);
+        }
+      } else {
+        console.log("❌ Prediction failed:");
+        console.log(`Status: ${result.status}`);
+        console.log(`Message: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+    }
+  };
+
   return (
     <div className="main-container">
       <h1 className="title">Moveo One</h1>
@@ -81,6 +106,12 @@ function App() {
           onBlur={handleInputBlur}
           placeholder="Type something..."
         />
+        <button
+          className="button predict"
+          onClick={handlePredict}
+        >
+          Get Prediction
+        </button>
       </div>
     </div>
   );

@@ -78,3 +78,12 @@
 .input-field::placeholder {
   color: #a0aec0;
 }
+
+.button.predict {
+  background-color: #9c27b0;
+  margin-top: 15px;
+}
+
+.button.predict:hover {
+  background-color: #7b1fa2;
+}
