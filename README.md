@@ -185,10 +185,9 @@ const result = await moveoOne.predict("your-model-id");
 if (result.success) {
   console.log("Prediction probability:", result.prediction_probability);
   console.log("Binary result:", result.prediction_binary);
-} else if (result.status === "pending") {
-  console.log("Model loading, please try again");
 } else {
-  console.log("Error:", result.message);
+  console.log("Status:", result.status);
+  console.log("Message:", result.message);
 }
 ```
 
@@ -230,7 +229,7 @@ async predict(modelId): Promise<PredictionResponse>
 {
   success: false,
   status: "pending",
-  message: "Model is loading, please try again"
+  message: "Model is loading"
 }
 ```
 
@@ -295,7 +294,7 @@ async predict(modelId): Promise<PredictionResponse>
 {
   success: false,
   status: "timeout",
-  message: "Request timed out after 10 seconds"
+  message: "Request timed out after 5 seconds"
 }
 ```
 
@@ -319,19 +318,14 @@ async function getPersonalizedRecommendations(userId) {
           reason: "Low confidence prediction"
         };
       }
-    } else if (prediction.status === "pending") {
-      // Model is still loading
-      console.log(prediction.message);
-      // Retry after a delay
-      return new Promise(resolve => {
-        setTimeout(async () => {
-          resolve(await getPersonalizedRecommendations(userId));
-        }, 2000);
-      });
     } else {
-      // Handle errors
-      console.error(`Prediction failed: ${prediction.message}`);
-      return null;
+      // Handle any non-success state (pending, errors, etc.)
+      console.log(`Prediction status: ${prediction.status}`);
+      console.log(`Message: ${prediction.message}`);
+      return {
+        showRecommendations: false,
+        reason: `Prediction not available: ${prediction.message}`
+      };
     }
   } catch (error) {
     console.error("Unexpected error during prediction:", error);
@@ -340,21 +334,11 @@ async function getPersonalizedRecommendations(userId) {
 }
 ```
 
-### Error Handling Best Practices
-
-1. **Always check `success` property first** to determine if the operation completed successfully
-2. **Check `status` property** to understand the specific outcome (success, pending, error type)
-3. **Handle pending states** appropriately - models may need time to load
-4. **Implement retry logic** for pending states or network errors
-5. **Log errors** for debugging purposes
-6. **Provide fallback behavior** when predictions fail
-
 ### Notes
 
 - The `predict` method is **non-blocking** and won't affect your application's performance
-- All requests have a 10-second timeout to prevent hanging
+- All requests have a 5-second timeout to prevent hanging
 - The method automatically uses the current session ID from the MoveoOne instance
-- **202 responses are normal pending states** - models may need time to load or validate
 - The method returns a Promise, so you can use async/await or `.then()/.catch()`
 
 ## Comprehensive Example Usage
