@@ -30,6 +30,7 @@ export class MoveoOne {
     this.context = "";
     this.sessionId = "";
     this.customPush = false;
+    this.latencyTrackingEnabled = true; // Default to true
   }
 
   static getInstance(token) {
@@ -246,6 +247,23 @@ export class MoveoOne {
     return this.context;
   }
 
+  /**
+   * Enable or disable latency tracking for predict method
+   * @param {boolean} enabled - Whether to enable latency tracking
+   * @throws {Error} If session is not started
+   */
+  calculateLatency(enabled) {
+    if (!this.started) {
+      throw new Error("Session must be started before calling calculateLatency. Call start() method first.");
+    }
+    
+    if (typeof enabled !== "boolean") {
+      throw new Error("calculateLatency parameter must be a boolean value");
+    }
+    
+    this.latencyTrackingEnabled = enabled;
+  }
+
   prepareProperties(moveoOneData) {
     let properties = {};
     properties["sg"] = moveoOneData.semanticGroup || "";
@@ -301,8 +319,11 @@ export class MoveoOne {
 
     this.log(`predict - request for model: "${modelId}"`);
     
+    // Start timing for latency tracking
+    const startTime = performance.now();
+    
     try {
-      const timeoutMs = 150; // 150ms
+      const timeoutMs = 400; // 400ms
       
       const response = await axios({
         method: "post",
@@ -321,6 +342,18 @@ export class MoveoOne {
       this.log(`predict - response for model "${modelId}":`, response.data);
       
       const { data, status } = response;
+      
+      // Calculate execution time
+      const endTime = performance.now();
+      const totalExecutionTimeMs = Math.round(endTime - startTime);
+      
+      // Send latency data asynchronously if tracking is enabled
+      if (this.latencyTrackingEnabled) {
+        // Use setTimeout to ensure this doesn't block the response
+        setTimeout(() => {
+          this.sendLatencyData(modelId, totalExecutionTimeMs, {});
+        }, 0);
+      }
       
       // Handle 202 responses (pending states)
       if (status === 202) {
@@ -352,11 +385,22 @@ export class MoveoOne {
       
       this.log(`predict - error for model "${modelId}":`, error.message);
       
+      // Calculate execution time for error cases too
+      const endTime = performance.now();
+      const totalExecutionTimeMs = Math.round(endTime - startTime);
+      
+      // Send latency data asynchronously if tracking is enabled (including timeout/error cases)
+      if (this.latencyTrackingEnabled) {
+        setTimeout(() => {
+          this.sendLatencyData(modelId, totalExecutionTimeMs, {});
+        }, 0);
+      }
+      
       if (error.code === "ECONNABORTED" || error.message.includes("timeout")) {
         return {
           success: false,
           status: "timeout",
-          message: "Request timed out after 150ms"
+          message: "Request timed out after 400ms"
         };
       }
 
@@ -422,6 +466,38 @@ export class MoveoOne {
         status: "unknown_error",
         message: error.message || "An unexpected error occurred"
       };
+    }
+  }
+
+  /**
+   * Sends latency data to the prediction-latency endpoint asynchronously
+   * @param {string} modelId - The model ID used for prediction
+   * @param {number} totalExecutionTimeMs - Total execution time in milliseconds
+   * @param {Object} latencyData - Additional latency data (currently empty object)
+   */
+  async sendLatencyData(modelId, totalExecutionTimeMs, latencyData = {}) {
+    try {
+      await axios({
+        method: "post",
+        url: `${DOLPHIN_BASE_URL}/api/prediction-latency`,
+        data: {
+          model_id: modelId,
+          session_id: this.sessionId,
+          client: "js",
+          total_execution_time_ms: totalExecutionTimeMs,
+          latency_data: latencyData
+        },
+        headers: {
+          Authorization: this.token,
+          "Content-Type": "application/json"
+        },
+        timeout: 5000 // 5 second timeout for latency data
+      });
+      
+      this.log(`Latency data sent for model "${modelId}": ${totalExecutionTimeMs}ms`);
+    } catch (error) {
+      this.log(`Failed to send latency data for model "${modelId}":`, error.message);
+      // Don't throw error - latency tracking should not affect client experience
     }
   }
 

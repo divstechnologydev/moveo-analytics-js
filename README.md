@@ -170,6 +170,29 @@ analytics.tick({
 
 The MoveoOne library includes a prediction method that allows you to get real-time predictions from your trained models using the current user's session data.
 
+### Latency Tracking
+
+The SDK automatically tracks prediction request latency and sends performance data to the MoveoOne analytics platform. This feature helps monitor model performance and identify optimization opportunities.
+
+**Key Features:**
+- Automatic latency measurement for all prediction requests
+- Asynchronous data transmission (doesn't affect prediction response time)
+- Tracks both successful predictions and error cases (including timeouts)
+- Configurable via `calculateLatency()` method
+
+**Usage:**
+```javascript
+// Enable latency tracking (default: true)
+moveoOne.calculateLatency(true);
+
+// Disable latency tracking
+moveoOne.calculateLatency(false);
+
+// Note: Can only be called after session is started
+moveoOne.start("app_context");
+moveoOne.calculateLatency(true);
+```
+
 ### Basic Usage
 
 ```javascript
@@ -303,7 +326,7 @@ async predict(modelId): Promise<PredictionResponse>
 {
   success: false,
   status: "timeout",
-  message: "Request timed out after 150ms"
+  message: "Request timed out after 400ms"
 }
 ```
 
@@ -346,9 +369,10 @@ async function getPersonalizedRecommendations(userId) {
 ### Notes
 
 - The `predict` method is **non-blocking** and won't affect your application's performance
-- All requests have a 150ms timeout to prevent hanging
+- All requests have a 400ms timeout to prevent hanging
 - The method automatically sends the current session ID and all buffered events from the MoveoOne instance
 - The method returns a Promise, so you can use async/await or `.then()/.catch()`
+- Latency tracking is enabled by default and runs asynchronously without affecting prediction response time
 
 ## Comprehensive Example Usage
 
