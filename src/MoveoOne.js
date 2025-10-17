@@ -435,8 +435,8 @@ export class MoveoOne {
           case 422:
             return {
               success: false,
-              status: "invalid_data",
-              message: data.detail || "Invalid prediction data"
+              status: "target_already_reached",
+              message: "Completion target already reached - prediction not applicable"
             };
           case 500:
             return {
