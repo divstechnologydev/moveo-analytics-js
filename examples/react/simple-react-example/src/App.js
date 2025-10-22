@@ -16,6 +16,9 @@ function App() {
       platform: "web",
     });
 
+    // Enable latency tracking for prediction requests
+    moveoInstance.calculateLatency(true);
+
     // Paragraph tracking (tick)
     moveoInstance.tick({
       semanticGroup: "content_section",
@@ -52,6 +55,35 @@ function App() {
     });
   };
 
+  const handlePredict = async () => {
+    try {
+      console.log("Making prediction request...");
+      console.log("Latency tracking is enabled - performance data will be sent automatically");
+      
+      const result = await moveoInstance.predict("demo-model-123");
+      
+      if (result.success) {
+        if (result.status === "success") {
+          console.log("✅ Prediction received:");
+          console.log(`Model ID: ${result.model_id}`);
+          console.log(`Probability: ${result.prediction_probability}`);
+          console.log(`Binary result: ${result.prediction_binary}`);
+          console.log("📊 Latency data sent to analytics platform");
+        } else if (result.status === "pending") {
+          console.log("⏳ Prediction pending:");
+          console.log(`Message: ${result.message}`);
+        }
+      } else {
+        console.log("❌ Prediction failed:");
+        console.log(`Status: ${result.status}`);
+        console.log(`Message: ${result.message}`);
+        console.log("📊 Latency data still sent for failed requests");
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+    }
+  };
+
   return (
     <div className="main-container">
       <h1 className="title">Moveo One</h1>
@@ -81,6 +113,12 @@ function App() {
           onBlur={handleInputBlur}
           placeholder="Type something..."
         />
+        <button
+          className="button predict"
+          onClick={handlePredict}
+        >
+          Get Prediction
+        </button>
       </div>
     </div>
   );

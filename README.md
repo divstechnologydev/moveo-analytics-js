@@ -15,6 +15,7 @@
   - [Metadata and Additional Metadata](#metadata-and-additional-metadata)
   - [Track Data](#track-data)
 - [Event Types and Actions](#event-types-and-actions)
+- [Prediction API](#prediction-api)
 - [Comprehensive Example Usage](#comprehensive-example-usage)
 - [Obtain API Key](#obtain-api-key)
 - [Dashboard Access](#dashboard-access)
@@ -164,6 +165,223 @@ analytics.tick({
 - `scroll` - Scrolling interactions
 - `focus` - Element receives focus
 - `blur` - Element loses focus
+
+## Prediction API
+
+The MoveoOne library includes a prediction method that allows you to get real-time predictions from your trained models using the current user's session data.
+
+### Latency Tracking
+
+The SDK automatically tracks prediction request latency and sends performance data to the MoveoOne analytics platform. This feature helps monitor model performance and identify optimization opportunities.
+
+**Key Features:**
+- Automatic latency measurement for all prediction requests
+- Asynchronous data transmission (doesn't affect prediction response time)
+- Tracks both successful predictions and error cases (including timeouts)
+- Configurable via `calculateLatency()` method
+
+**Usage:**
+```javascript
+// Enable latency tracking (default: true)
+moveoOne.calculateLatency(true);
+
+// Disable latency tracking
+moveoOne.calculateLatency(false);
+
+// Note: Can only be called after session is started
+moveoOne.start("app_context");
+moveoOne.calculateLatency(true);
+```
+
+### Basic Usage
+
+```javascript
+// Make sure to start a session first
+moveoOne.start("app_context", {
+  version: "1.0.0",
+  environment: "production"
+});
+
+// Get prediction from a model
+const result = await moveoOne.predict("your-model-id");
+
+if (result.success) {
+  console.log("Prediction probability:", result.prediction_probability);
+  console.log("Binary result:", result.prediction_binary);
+} else {
+  console.log("Status:", result.status);
+  console.log("Message:", result.message);
+}
+```
+
+### Prerequisites
+
+Before using the predict method, ensure:
+
+1. **Session is started**: Call `moveoOne.start()` before making predictions
+2. **Valid token**: The MoveoOne instance must be initialized with a valid API token
+3. **Model access**: Your token must have access to the specified model
+
+### Method Signature
+
+```javascript
+async predict(modelId): Promise<PredictionResponse>
+```
+
+**Parameters:**
+- `modelId` (string, required): The ID of the model to use for prediction
+
+**Returns:** Promise that resolves to an object
+
+### Response Examples
+
+#### Successful Prediction
+
+```javascript
+{
+  success: true,
+  status: "success",
+  prediction_probability: 0.85,
+  prediction_binary: true
+}
+```
+
+#### Pending Model Loading
+
+```javascript
+{
+  success: false,
+  status: "pending",
+  message: "Model is loading"
+}
+```
+
+#### Error Responses
+
+**Invalid Model ID**
+```javascript
+{
+  success: false,
+  status: "invalid_model_id",
+  message: "Model ID is required and must be a non-empty string"
+}
+```
+
+**Not Initialized**
+```javascript
+{
+  success: false,
+  status: "not_initialized",
+  message: "MoveoOne must be initialized with a valid token before using predict method"
+}
+```
+
+**No Session Started**
+```javascript
+{
+  success: false,
+  status: "no_session",
+  message: "Session must be started before making predictions. Call start() method first."
+}
+```
+
+**Model Not Found**
+```javascript
+{
+  success: false,
+  status: "not_found",
+  message: "Model not found or not accessible"
+}
+```
+
+**Conflict (Conditional Event Not Found)**
+```javascript
+{
+  success: false,
+  status: "conflict",
+  message: "Conditional event is not found"
+}
+```
+
+**Target Already Reached**
+```javascript
+{
+  success: false,
+  status: "target_already_reached",
+  message: "Completion target already reached - prediction not applicable"
+}
+```
+
+**Server Error**
+```javascript
+{
+  success: false,
+  status: "server_error",
+  message: "Server error processing prediction request"
+}
+```
+
+**Network Error**
+```javascript
+{
+  success: false,
+  status: "network_error",
+  message: "Network error - please check your connection"
+}
+```
+
+**Request Timeout**
+```javascript
+{
+  success: false,
+  status: "timeout",
+  message: "Request timed out after 400ms"
+}
+```
+
+### Advanced Usage Example
+
+```javascript
+async function getPersonalizedRecommendations(userId) {
+  try {
+    const prediction = await moveoOne.predict(`recommendation-model-${userId}`);
+    
+    if (prediction.success) {
+      // Prediction completed successfully
+      if (prediction.prediction_binary) {
+        return {
+          showRecommendations: true,
+          confidence: prediction.prediction_probability
+        };
+      } else {
+        return {
+          showRecommendations: false,
+          reason: "Low confidence prediction"
+        };
+      }
+    } else {
+      // Handle any non-success state (pending, errors, etc.)
+      console.log(`Prediction status: ${prediction.status}`);
+      console.log(`Message: ${prediction.message}`);
+      return {
+        showRecommendations: false,
+        reason: `Prediction not available: ${prediction.message}`
+      };
+    }
+  } catch (error) {
+    console.error("Unexpected error during prediction:", error);
+    return null;
+  }
+}
+```
+
+### Notes
+
+- The `predict` method is **non-blocking** and won't affect your application's performance
+- All requests have a 400ms timeout to prevent hanging
+- The method automatically sends the current session ID and all buffered events from the MoveoOne instance
+- The method returns a Promise, so you can use async/await or `.then()/.catch()`
+- Latency tracking is enabled by default and runs asynchronously without affecting prediction response time
 
 ## Comprehensive Example Usage
 
